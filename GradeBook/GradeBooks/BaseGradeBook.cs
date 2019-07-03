@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace GradeBook.GradeBooks
 {
-    public abstract class BaseGradeBook
+    public class BaseGradeBook
     {
         public string Name { get; set; }
         public List<Student> Students { get; set; }
@@ -230,18 +230,18 @@ namespace GradeBook.GradeBooks
         {
             // Get GradeBookType from the GradeBook.Enums namespace
             var gradebookEnum = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                                 from type in assembly.GetTypes()
-                                 where type.FullName == "GradeBook.Enums.GradeBookType"
-                                 select type).FirstOrDefault();
+                from type in assembly.GetTypes()
+                where type.FullName == "GradeBook.Enums.GradeBookType"
+                select type).FirstOrDefault();
 
             var jobject = JsonConvert.DeserializeObject<JObject>(json);
             var gradeBookType = jobject.Property("Type")?.Value?.ToString();
 
             // Check if StandardGradeBook exists
             if ((from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                 from type in assembly.GetTypes()
-                 where type.FullName == "GradeBook.GradeBooks.StandardGradeBook"
-                 select type).FirstOrDefault() == null)
+                    from type in assembly.GetTypes()
+                    where type.FullName == "GradeBook.GradeBooks.StandardGradeBook"
+                    select type).FirstOrDefault() == null)
                 gradeBookType = "Base";
             else
             {
@@ -253,18 +253,18 @@ namespace GradeBook.GradeBooks
 
             // Get GradeBook from the GradeBook.GradeBooks namespace
             var gradebook = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                             from type in assembly.GetTypes()
-                             where type.FullName == "GradeBook.GradeBooks." + gradeBookType + "GradeBook"
-                             select type).FirstOrDefault();
+                from type in assembly.GetTypes()
+                where type.FullName == "GradeBook.GradeBooks." + gradeBookType + "GradeBook"
+                select type).FirstOrDefault();
 
 
             //protection code
             if (gradebook == null)
                 gradebook = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                             from type in assembly.GetTypes()
-                             where type.FullName == "GradeBook.GradeBooks.StandardGradeBook"
-                             select type).FirstOrDefault();
-            
+                    from type in assembly.GetTypes()
+                    where type.FullName == "GradeBook.GradeBooks.StandardGradeBook"
+                    select type).FirstOrDefault();
+
             return JsonConvert.DeserializeObject(json, gradebook);
         }
     }
